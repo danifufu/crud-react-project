@@ -1,3 +1,4 @@
+// Imports
 import React, { useState, useEffect, useRef } from 'react';
 import { classNames } from 'primereact/utils';
 import { DataTable } from 'primereact/datatable';
@@ -20,9 +21,11 @@ import {
     getDocs, 
 } from 'firebase/firestore';
 
+// URL das APIs
 const urlCep = 'https://viacep.com.br/ws/*/json';
 const urlUf = "https://servicodados.ibge.gov.br/api/v1/localidades/estados/";
 
+// Firebase connections
 const firebaseApp = initializeApp({
     apiKey: "AIzaSyD5kiptu1dn4Zz6Psg_ak9iqDGtVDNZmN0",
     authDomain: "crud-react-26c29.firebaseapp.com",
@@ -47,17 +50,15 @@ export function List() {
         number: '',
     };
 
+    const genderOptions = [
+        { name: 'Masculino', code: 'M' },
+        { name: 'Feminino', code: 'F' },
+        { name: 'Outro', code: 'O' },
+    ];
+
     const [selectedCity, setSelectedCity] = useState(null);
     const [selectedState, setSelectedState] = useState(null);
     const [selectedGender, setSelectedGender] = useState(null);
-
-    const genderOptions = [
-        { name: 'Masculino', code: 'Ma' },
-        { name: 'Feminino', code: 'Fe' },
-        { name: 'Outro', code: 'Ou' },
-    ];
-
-
     const [users, setUsers] = useState(null);
     const [userDialog, setUserDialog] = useState(false);
     const [deleteUserDialog, setDeleteUserDialog] = useState(false);
@@ -70,6 +71,7 @@ export function List() {
     const toast = useRef(null);
     const dt = useRef(null);
 
+    // Inicialização de algumas variáveis do projeto no primeiro ciclo de vida do componente
     useEffect(() => {
         const getUsers = async () => {
             const data = await getDocs(usersCollectionRef);
@@ -88,10 +90,11 @@ export function List() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    // Lógica do BuscaCEP
     const buscaCep = (cep) => {
 
         let _user = { ...user };
-        let cepFiltered = cep.replaceAll('_', '').replaceAll('-', '')
+        let cepFiltered = cep.replaceAll('_', '').replaceAll('-', '');
 
         if(cepFiltered.length == 8){
             let newUrl = urlCep.replace('*', cepFiltered);
@@ -126,6 +129,7 @@ export function List() {
         
     }
 
+    // Botão New
     const openNew = () => {
         setUser(emptyUser);
         setSelectedGender(null);
@@ -145,6 +149,7 @@ export function List() {
         setDeleteUserDialog(false);
     };
 
+    // lógica para salvar e editar o usuário
     const saveUser = async () => {
         setSubmitted(true);
 
@@ -206,6 +211,7 @@ export function List() {
         setUserDialog(true);
     };
 
+    // lógica para deletar o usuário
     const confirmDeleteUser = (user) => {
         setUser(user);
         setDeleteUserDialog(true);
@@ -236,6 +242,7 @@ export function List() {
         return index;
     };
 
+    // atualização das cidades da API do IBGE
     const updateCities = (stateId) => { 
         const url = urlUf + stateId + "/municipios";
 
@@ -259,6 +266,7 @@ export function List() {
         updateCities(e.value.id);
     }
 
+    // atualização dos valores dos inputs
     const onInputChange = (e, name) => {
         const val = (e.target && e.target.value) || '';
         let _user = { ...user };
@@ -381,7 +389,6 @@ export function List() {
                         <label htmlFor="cep" className="font-bold">
                             CEP
                         </label>
-                        {/* <InputText id="cep" value={user.cep} onChange={(e) => onInputChange(e, 'cep')} required className={classNames({ 'p-invalid': submitted && !user.cep })} /> */}
                         <InputMask id="cep" value={user.cep} onChange={(e) => onInputChange(e, 'cep')} mask="99999-999" placeholder="99999-999"
                         className={classNames({ 'p-invalid': submitted && !user.cep })}/>
                         {submitted && !user.cep && <small className="p-error">CEP é obrigatório!</small>}
@@ -444,4 +451,3 @@ export function List() {
         </div>
     );
 }
-        
